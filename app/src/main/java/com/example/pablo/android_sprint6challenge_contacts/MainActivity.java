@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
 
 import com.example.pablo.android_sprint6challenge_contacts.Model.MyContacts;
 
@@ -47,9 +48,21 @@ public class MainActivity extends AppCompatActivity {
                 {while(phoneCursor.moveToNext())
                 {
                     String phoneNumberValue = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+                    MyContacts myContacts = new MyContacts(name,phoneNumberValue);
+
+                    arrayList.add(myContacts);
                 }
             }
+
+            phoneCursor.close();
         }
     }
+
+    // initialize the adapter and set it to recyclerView
+    }
+    else
+    {
+        Toast.makeText(getApplicationContext(), "No Contacts found", Toast.LENGTH_SHORT).show();
     }
 }
