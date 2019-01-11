@@ -8,61 +8,61 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
+import com.example.pablo.android_sprint6challenge_contacts.Adapeters.MyAdapter;
 import com.example.pablo.android_sprint6challenge_contacts.Model.MyContacts;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-   RecyclerView recyclerView;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        
+
         loadContacts();
     }
 
-    private ArrayList<MyContacts> loadContacts() {
-        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI,null,null,null,ContactsContract.CommonDataKinds.Phone.NUMBER);
+    private void loadContacts() {
+        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.NUMBER);
 
-    ArrayList<MyContacts> arrayList = new ArrayList<>();
+        ArrayList<MyContacts> arrayList = new ArrayList<>();
 
-    if(cursor.getCount()>0)
-    {
-        while (cursor.moveToNext())
-        {
-            String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+        if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
-            if(number.length() > 0){
+                if (number.length() > 0) {
 
-                Cursor phoneCursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{id},null);
+                    Cursor phoneCursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{id}, null);
 
-                if (phoneCursor.getCount() > 0)
-                {while(phoneCursor.moveToNext())
-                {
-                    String phoneNumberValue = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    if (phoneCursor.getCount() > 0) {
+                        while (phoneCursor.moveToNext()) {
+                            String phoneNumberValue = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-                    MyContacts myContacts = new MyContacts(name,phoneNumberValue);
+                            MyContacts myContacts = new MyContacts(name, phoneNumberValue);
 
-                    arrayList.add(myContacts);
+                            arrayList.add(myContacts);
+                        }
+                    }
+
+                    phoneCursor.close();
                 }
             }
 
-            phoneCursor.close();
-        }
-    }
+            // initialize the adapter and set it to recyclerView
+            MyAdapter myAdapter = new MyAdapter(this, ArrayList);
+            myAdapter.notifyDataSetChanged();
 
-    // initialize the adapter and set it to recyclerView
-    }
-    else
-    {
-        Toast.makeText(getApplicationContext(), "No Contacts found", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "No Contacts found", Toast.LENGTH_SHORT).show();
+        }
     }
 }
