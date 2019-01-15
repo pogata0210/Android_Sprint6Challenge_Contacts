@@ -75,7 +75,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyAdapterViewHolde
                         // for ActivityCompat#requestPermissions for more details.
                         return;
                     }
-                    context.startActivities(intent);
+                    context.startActivity(intent);
                 }
             });
 

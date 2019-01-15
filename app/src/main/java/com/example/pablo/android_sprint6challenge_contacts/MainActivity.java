@@ -58,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // initialize the adapter and set it to recyclerView
-            MyAdapter myAdapter = new MyAdapter(this, ArrayList);
+            MyAdapter myAdapter = new MyAdapter(this, arrayList);
+            recyclerView.setAdapter(myAdapter);
             myAdapter.notifyDataSetChanged();
 
         } else {
