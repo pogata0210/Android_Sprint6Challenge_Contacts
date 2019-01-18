@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.pablo.android_sprint6challenge_contacts.Model.MyContacts;
-import com.example.pablo.android_sprint6challenge_contacts.R;
+
 
 import java.util.ArrayList;
 
