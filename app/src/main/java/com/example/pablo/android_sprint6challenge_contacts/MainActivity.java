@@ -1,69 +1,46 @@
 package com.example.pablo.android_sprint6challenge_contacts;
 
-import android.database.Cursor;
-import android.provider.ContactsContract;
+import android.app.Activity;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
-
-import com.example.pablo.android_sprint6challenge_contacts.Adapeters.MyAdapter;
-import com.example.pablo.android_sprint6challenge_contacts.Model.MyContacts;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
-    RecyclerView recyclerView;
+    private Context context;
+    private Activity activity;
+    private ListAdapter listAdapter;
+    private ArrayList<MyContacts> arrayList;
+    private RecyclerView recyclerView;
+    private LinearLayoutManager layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        arrayList = new ArrayList<>();
+        recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        loadContacts();
-    }
-
-    private void loadContacts() {
-        Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.NUMBER);
-
-        ArrayList<MyContacts> arrayList = new ArrayList<>();
-
-        if (cursor.getCount() > 0) {
-            while (cursor.moveToNext()) {
-                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                String number = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-
-                if (number.length() > 0) {
-
-                    Cursor phoneCursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + "=?", new String[]{id}, null);
-
-                    if (phoneCursor.getCount() > 0) {
-                        while (phoneCursor.moveToNext()) {
-                            String phoneNumberValue = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-
-                            MyContacts myContacts = new MyContacts(name, phoneNumberValue);
-
-                            arrayList.add(myContacts);
+        layoutManager = new LinearLayoutManager(context);
+        recyclerView.setLayoutManager(layoutManager);
+        listAdapter = new ListAdapter(arrayList, activity);
+        recyclerView.setAdapter(listAdapter);
+        ApiDao.getAllContacts(new ApiDao.ObjectCallback<ArrayList<MyContacts>>() {
+            @Override
+            public void returnObjects(ArrayList<MyContacts> result) {
+                for (final MyContacts i : result) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            arrayList.add(i);
+                            listAdapter.notifyDataSetChanged();
                         }
-                    }
-
-                    phoneCursor.close();
+                    });
                 }
             }
-
-            // initialize the adapter and set it to recyclerView
-            MyAdapter myAdapter = new MyAdapter(this, arrayList);
-            recyclerView.setAdapter(myAdapter);
-            myAdapter.notifyDataSetChanged();
-
-        } else {
-            Toast.makeText(getApplicationContext(), "No Contacts found", Toast.LENGTH_SHORT).show();
-        }
+        });
     }
 }
